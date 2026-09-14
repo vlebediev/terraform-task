@@ -4,7 +4,7 @@ resource "aws_instance" "this" {
   subnet_id                   = var.subnet_id
   associate_public_ip_address = var.associate_public_ip
   key_name                    = var.key_name
-  vpc_security_group_ids      = var.security_group_ids
+  vpc_security_group_ids      = length(var.security_group_ids) > 0 ? var.security_group_ids : null
   iam_instance_profile        = var.iam_instance_profile
   user_data                   = var.user_data
 

@@ -113,3 +113,38 @@ resource "aws_ssm_parameter" "instances" {
     ]
   })
 }
+
+# --- SG for RDS: MySQL only from the public (WordPress) instance ---
+resource "aws_security_group" "rds" {
+  name        = "vlebediev-rds"
+  description = "Allow MySQL from the WordPress instance only"
+  vpc_id      = module.vpc.vpc_id
+
+  ingress {
+    description     = "MySQL from public instance SG"
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.public_ssh.id]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = { Name = "vlebediev-rds" }
+}
+
+module "rds" {
+  source = "./modules/rds"
+
+  identifier             = "vlebediev-wordpress"
+  db_name                = "wordpress"
+  db_username            = "wpadmin"
+  subnet_ids             = module.vpc.private_subnet_ids
+  vpc_security_group_ids = [aws_security_group.rds.id]
+  ssm_prefix             = "/vlebediev/wordpress"
+}
