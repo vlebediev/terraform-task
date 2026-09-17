@@ -9,6 +9,18 @@ REGION="${AWS_REGION:-$(curl -s --max-time 2 -H "X-aws-ec2-metadata-token: $TOKE
 P=/vlebediev/wordpress
 echo "Region resolved: ${REGION}"
 
+# Wait for DB credentials to appear in SSM (RDS may still be provisioning).
+echo "Waiting for DB credentials in SSM..."
+for i in $(seq 1 60); do
+  if aws ssm get-parameter --region "$REGION" --name "$P/db_host" \
+       --query 'Parameter.Value' --output text >/dev/null 2>&1; then
+    echo "DB credentials found in SSM (attempt $i)."
+    break
+  fi
+  echo "  not ready yet (attempt $i/60), retrying in 10s..."
+  sleep 10
+done
+
 echo "Fetching DB credentials from SSM Parameter Store..."
 export WORDPRESS_DB_HOST="$(aws ssm get-parameter --region $REGION --name $P/db_host --query 'Parameter.Value' --output text)"
 export WORDPRESS_DB_NAME="$(aws ssm get-parameter --region $REGION --name $P/db_name --query 'Parameter.Value' --output text)"
@@ -17,5 +29,4 @@ export WORDPRESS_DB_PASSWORD="$(aws ssm get-parameter --region $REGION --name $P
 
 echo "DB host resolved: ${WORDPRESS_DB_HOST}"
 
-# hand control over to the WordPress image's native entrypoint
-exec docker-entrypoint.sh "$@"  
+exec docker-entrypoint.sh "$@"
