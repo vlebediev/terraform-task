@@ -4,4 +4,4 @@
 *.tfstate.*
 *.tfvars
 crash.log
-crash.*.log
+crash.*.log.terragrunt-cache/

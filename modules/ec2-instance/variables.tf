@@ -32,6 +32,7 @@ variable "associate_public_ip" {
 variable "key_name" {
   type        = string
   description = "Name of the EC2 key pair"
+  default     = null
 }
 
 variable "security_group_ids" {
