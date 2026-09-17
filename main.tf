@@ -50,8 +50,6 @@ module "wordpress" {
 
   depends_on = [module.rds]
 
-  depends_on = [module.rds]
-}
 
 # --- Private instances: 2x t2.nano, 8GB, private only ---
 module "ec2_private" {
