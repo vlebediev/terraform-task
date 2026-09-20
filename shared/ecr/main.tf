@@ -41,9 +41,9 @@ resource "aws_ecr_repository" "wordpress" {
 # --- Auto build+push the image; re-runs only when Dockerfile/entrypoint change ---
 resource "null_resource" "image_push" {
   triggers = {
-    dockerfile  = filesha256("${path.module}/../../wordpress-image/Dockerfile")
-    entrypoint  = filesha256("${path.module}/../../wordpress-image/entrypoint.sh")
-    repo_url    = aws_ecr_repository.wordpress.repository_url
+    dockerfile = filesha256("${path.module}/../../wordpress-image/Dockerfile")
+    entrypoint = filesha256("${path.module}/../../wordpress-image/entrypoint.sh")
+    repo_url   = aws_ecr_repository.wordpress.repository_url
   }
 
   provisioner "local-exec" {
