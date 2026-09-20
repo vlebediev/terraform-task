@@ -48,8 +48,7 @@ module "wordpress" {
   key_name   = aws_key_pair.this.key_name
   aws_region = var.aws_region
 
-  depends_on = [module.rds]
-
+}
 
 # --- Private instances: 2x t2.nano, 8GB, private only ---
 module "ec2_private" {
@@ -118,12 +117,13 @@ resource "aws_security_group" "rds" {
 module "rds" {
   source = "./modules/rds"
 
-  identifier             = "vlebediev-wordpress"
-  db_name                = "wordpress"
-  db_username            = "wpadmin"
-  subnet_ids             = module.vpc.private_subnet_ids
-  vpc_security_group_ids = [aws_security_group.rds.id]
-  ssm_prefix             = "/vlebediev/wordpress"
+  identifier   = "vlebediev-wordpress"
+  db_name      = "wordpress"
+  db_username  = "wpadmin"
+  subnet_ids   = module.vpc.private_subnet_ids
+  vpc_id       = module.vpc.vpc_id
+  allowed_cidr = var.vpc_cidr
+  ssm_prefix   = "/vlebediev/wordpress"
 }
 
 # --- DNS: point the subdomain at the WordPress instance's EIP ---

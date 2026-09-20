@@ -36,9 +36,14 @@ variable "subnet_ids" {
   description = "Subnets for the DB subnet group (need >=2 AZs)"
 }
 
-variable "vpc_security_group_ids" {
-  type        = list(string)
-  description = "Security groups for the RDS instance"
+variable "vpc_id" {
+  type        = string
+  description = "VPC for the RDS security group"
+}
+
+variable "allowed_cidr" {
+  type        = string
+  description = "CIDR allowed to reach MySQL (e.g. the VPC CIDR)"
 }
 
 variable "ssm_prefix" {
