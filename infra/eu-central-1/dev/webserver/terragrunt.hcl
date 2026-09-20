@@ -3,7 +3,7 @@ include "root" {
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/ec2-instance"
+  source = "${get_repo_root()}/modules/wordpress"
 }
 
 dependency "vpc" {
@@ -15,11 +15,18 @@ dependency "vpc" {
   }
 }
 
+dependency "rds" {
+  config_path = "../rds"
+
+  mock_outputs = {
+    endpoint = "mock.rds.amazonaws.com"
+  }
+}
+
 inputs = {
-  name                = "vlebediev-tg-webserver"
-  ami_id              = "ami-03b2339b9507d3747"
-  instance_type       = "t2.micro"
-  subnet_id           = dependency.vpc.outputs.public_subnet_ids[0]
-  disk_size           = 10
-  associate_public_ip = true
+  name       = "vlebediev-tg-wordpress"
+  ami_id     = "ami-03b2339b9507d3747"
+  vpc_id     = dependency.vpc.outputs.vpc_id
+  subnet_id  = dependency.vpc.outputs.public_subnet_ids[0]
+  aws_region = "eu-central-1"
 }
