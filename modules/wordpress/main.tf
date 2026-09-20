@@ -123,3 +123,23 @@ resource "aws_instance" "this" {
     create_before_destroy = true
   }
 }
+
+# --- Elastic IP for stable addressing ---
+resource "aws_eip" "this" {
+  instance = aws_instance.this.id
+  domain   = "vpc"
+  tags     = { Name = "${var.name}-eip" }
+}
+
+# --- DNS A record -> EIP ---
+data "aws_route53_zone" "this" {
+  name = var.zone_name
+}
+
+resource "aws_route53_record" "this" {
+  zone_id = data.aws_route53_zone.this.zone_id
+  name    = var.domain_name
+  type    = "A"
+  ttl     = 300
+  records = [aws_eip.this.public_ip]
+}

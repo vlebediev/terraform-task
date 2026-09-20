@@ -9,8 +9,13 @@ output "public_subnet_ids" {
 output "private_subnet_ids" {
   value = module.vpc.private_subnet_ids
 }
+
 output "public_instance_ip" {
-  value = var.enable_eip ? aws_eip.public[0].public_ip : module.wordpress.public_ip
+  value = module.wordpress.public_ip
+}
+
+output "wordpress_domain" {
+  value = module.wordpress.domain
 }
 
 output "rds_endpoint" {

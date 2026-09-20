@@ -39,7 +39,3 @@ variable "ami_id" {
   default     = "ami-03b2339b9507d3747"
 }
 
-variable "enable_eip" {
-  type        = bool
-  description = "Create and attach an Elastic IP to the public instance"
-}

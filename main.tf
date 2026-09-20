@@ -37,17 +37,18 @@ resource "aws_key_pair" "this" {
   public_key = var.key_public_key
 }
 
-# --- WordPress (public): instance + IAM + SG + user-data, image from shared ECR ---
+# --- WordPress (public): instance + IAM + SG + user-data + EIP + DNS, image from shared ECR ---
 module "wordpress" {
   source = "./modules/wordpress"
 
-  name       = "vlebediev-wordpress"
-  ami_id     = var.ami_id
-  vpc_id     = module.vpc.vpc_id
-  subnet_id  = module.vpc.public_subnet_ids[0]
-  key_name   = aws_key_pair.this.key_name
-  aws_region = var.aws_region
-
+  name        = "vlebediev-wordpress"
+  ami_id      = var.ami_id
+  vpc_id      = module.vpc.vpc_id
+  subnet_id   = module.vpc.public_subnet_ids[0]
+  key_name    = aws_key_pair.this.key_name
+  aws_region  = var.aws_region
+  domain_name = "vlebediev.romexsoft.net"
+  zone_name   = "vlebediev.romexsoft.net"
 }
 
 # --- Private instances: 2x t2.nano, 8GB, private only ---
@@ -64,14 +65,6 @@ module "ec2_private" {
   key_name            = aws_key_pair.this.key_name
 }
 
-# --- Conditional EIP for the WordPress instance ---
-resource "aws_eip" "public" {
-  count    = var.enable_eip ? 1 : 0
-  instance = module.wordpress.instance_id
-  domain   = "vpc"
-  tags     = { Name = "vlebediev-public-eip" }
-}
-
 # --- SSM /Instances parameter with JSON content ---
 resource "aws_ssm_parameter" "instances" {
   name = "/Instances"
@@ -80,7 +73,7 @@ resource "aws_ssm_parameter" "instances" {
   value = jsonencode({
     public = {
       name      = "vlebediev-wordpress"
-      public-ip = var.enable_eip ? aws_eip.public[0].public_ip : module.wordpress.public_ip
+      public-ip = module.wordpress.public_ip
     }
     private = [
       for inst in module.ec2_private : {
@@ -88,30 +81,6 @@ resource "aws_ssm_parameter" "instances" {
       }
     ]
   })
-}
-
-# --- SG for RDS: MySQL only from the WordPress instance ---
-resource "aws_security_group" "rds" {
-  name        = "vlebediev-rds"
-  description = "Allow MySQL from the WordPress instance only"
-  vpc_id      = module.vpc.vpc_id
-
-  ingress {
-    description     = "MySQL from WordPress SG"
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [module.wordpress.security_group_id]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = { Name = "vlebediev-rds" }
 }
 
 module "rds" {
@@ -124,17 +93,4 @@ module "rds" {
   vpc_id       = module.vpc.vpc_id
   allowed_cidr = var.vpc_cidr
   ssm_prefix   = "/vlebediev/wordpress"
-}
-
-# --- DNS: point the subdomain at the WordPress instance's EIP ---
-data "aws_route53_zone" "this" {
-  name = "vlebediev.romexsoft.net"
-}
-
-resource "aws_route53_record" "wordpress" {
-  zone_id = data.aws_route53_zone.this.zone_id
-  name    = "vlebediev.romexsoft.net"
-  type    = "A"
-  ttl     = 300
-  records = [var.enable_eip ? aws_eip.public[0].public_ip : module.wordpress.public_ip]
 }

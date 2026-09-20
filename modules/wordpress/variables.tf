@@ -49,3 +49,13 @@ variable "aws_region" {
   type    = string
   default = "eu-central-1"
 }
+
+variable "domain_name" {
+  type        = string
+  description = "FQDN to point at the instance (A record)"
+}
+
+variable "zone_name" {
+  type        = string
+  description = "Route53 hosted zone name that owns the domain"
+}
