@@ -24,9 +24,11 @@ dependency "rds" {
 }
 
 inputs = {
-  name       = "vlebediev-tg-wordpress"
-  ami_id     = "ami-03b2339b9507d3747"
-  vpc_id     = dependency.vpc.outputs.vpc_id
-  subnet_id  = dependency.vpc.outputs.public_subnet_ids[0]
-  aws_region = "eu-central-1"
+  name        = "vlebediev-tg-wordpress"
+  ami_id      = "ami-03b2339b9507d3747"
+  vpc_id      = dependency.vpc.outputs.vpc_id
+  subnet_id   = dependency.vpc.outputs.public_subnet_ids[0]
+  aws_region  = "eu-central-1"
+  domain_name = "vlebediev.romexsoft.net"
+  zone_name   = "vlebediev.romexsoft.net"
 }
