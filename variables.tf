@@ -39,3 +39,8 @@ variable "ami_id" {
   default     = "ami-03b2339b9507d3747"
 }
 
+
+variable "enable_eip" {
+  type        = bool
+  description = "Conditionally create Elastic IP for the WordPress instance (Terraform asks on apply)"
+}

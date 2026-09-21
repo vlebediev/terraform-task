@@ -3,7 +3,7 @@ output "instance_id" {
 }
 
 output "public_ip" {
-  value = aws_eip.this.public_ip
+  value = var.enable_eip ? aws_eip.this[0].public_ip : aws_instance.this.public_ip
 }
 
 output "security_group_id" {
@@ -11,5 +11,5 @@ output "security_group_id" {
 }
 
 output "domain" {
-  value = aws_route53_record.this.name
+  value = var.enable_eip ? aws_route53_record.this[0].name : null
 }

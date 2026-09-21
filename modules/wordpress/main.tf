@@ -124,22 +124,25 @@ resource "aws_instance" "this" {
   }
 }
 
-# --- Elastic IP for stable addressing ---
+# --- Elastic IP (conditional) ---
 resource "aws_eip" "this" {
+  count    = var.enable_eip ? 1 : 0
   instance = aws_instance.this.id
   domain   = "vpc"
   tags     = { Name = "${var.name}-eip" }
 }
 
-# --- DNS A record -> EIP ---
+# --- DNS A record -> EIP (only when EIP is created) ---
 data "aws_route53_zone" "this" {
-  name = var.zone_name
+  count = var.enable_eip ? 1 : 0
+  name  = var.zone_name
 }
 
 resource "aws_route53_record" "this" {
-  zone_id = data.aws_route53_zone.this.zone_id
+  count   = var.enable_eip ? 1 : 0
+  zone_id = data.aws_route53_zone.this[0].zone_id
   name    = var.domain_name
   type    = "A"
   ttl     = 300
-  records = [aws_eip.this.public_ip]
+  records = [aws_eip.this[0].public_ip]
 }

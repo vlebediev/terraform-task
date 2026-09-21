@@ -49,6 +49,7 @@ module "wordpress" {
   aws_region  = var.aws_region
   domain_name = "vlebediev.romexsoft.net"
   zone_name   = "vlebediev.romexsoft.net"
+  enable_eip  = var.enable_eip
 }
 
 # --- Private instances: 2x t2.nano, 8GB, private only ---

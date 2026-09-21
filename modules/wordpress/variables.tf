@@ -59,3 +59,8 @@ variable "zone_name" {
   type        = string
   description = "Route53 hosted zone name that owns the domain"
 }
+
+variable "enable_eip" {
+  type        = bool
+  description = "Conditionally create and attach an Elastic IP (and DNS) to the instance"
+}

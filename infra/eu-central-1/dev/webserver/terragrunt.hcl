@@ -31,4 +31,5 @@ inputs = {
   aws_region  = "eu-central-1"
   domain_name = "vlebediev.romexsoft.net"
   zone_name   = "vlebediev.romexsoft.net"
+  enable_eip = true
 }
