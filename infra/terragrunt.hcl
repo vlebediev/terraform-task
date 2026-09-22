@@ -26,7 +26,8 @@ PROVIDER
 }
 
 locals {
-  env = "dev"
+  env    = "dev"
+  domain = "vlebediev.romexsoft.net"
 }
 
 terraform {

@@ -1,5 +1,6 @@
 include "root" {
-  path = find_in_parent_folders()
+  path   = find_in_parent_folders()
+  expose = true
 }
 
 terraform {
@@ -29,7 +30,7 @@ inputs = {
   vpc_id      = dependency.vpc.outputs.vpc_id
   subnet_id   = dependency.vpc.outputs.public_subnet_ids[0]
   aws_region  = "eu-central-1"
-  domain_name = "vlebediev.romexsoft.net"
-  zone_name   = "vlebediev.romexsoft.net"
-  enable_eip = true
+  domain_name = include.root.locals.domain
+  zone_name   = include.root.locals.domain
+  enable_eip  = true
 }
