@@ -47,8 +47,8 @@ module "wordpress" {
   subnet_id   = module.vpc.public_subnet_ids[0]
   key_name    = aws_key_pair.this.key_name
   aws_region  = var.aws_region
-  domain_name = "vlebediev.romexsoft.net"
-  zone_name   = "vlebediev.romexsoft.net"
+  domain_name = var.wordpress_domain
+  zone_name   = var.wordpress_domain
   enable_eip  = var.enable_eip
 }
 

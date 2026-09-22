@@ -44,3 +44,9 @@ variable "enable_eip" {
   type        = bool
   description = "Conditionally create Elastic IP for the WordPress instance (Terraform asks on apply)"
 }
+
+variable "wordpress_domain" {
+  type        = string
+  description = "FQDN and hosted zone name for the WordPress site"
+  default     = "vlebediev.romexsoft.net"
+}
