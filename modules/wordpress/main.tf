@@ -139,7 +139,7 @@ data "aws_route53_zone" "this" {
 }
 
 resource "aws_route53_record" "this" {
-  count   = var.enable_eip ? 1 : 0
+  count   = var.enable_eip && var.domain_name != "" && var.zone_name != "" ? 1 : 0 
   zone_id = data.aws_route53_zone.this[0].zone_id
   name    = var.domain_name
   type    = "A"

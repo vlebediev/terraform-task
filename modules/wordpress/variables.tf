@@ -51,11 +51,13 @@ variable "aws_region" {
 }
 
 variable "domain_name" {
+  default  = "" 
   type        = string
   description = "FQDN to point at the instance (A record)"
 }
 
 variable "zone_name" {
+  default  = ""
   type        = string
   description = "Route53 hosted zone name that owns the domain"
 }
